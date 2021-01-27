@@ -1,72 +1,54 @@
-import axios from 'axios'
-import React, { useState, useEffect, useRef } from 'react'
-import Form from 'react-bootstrap/Form'
-import Container from 'react-bootstrap/Container'
-import Button from 'react-bootstrap/Button'
-import io from 'socket.io-client'
+import React, { useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 
-// const socket = io('http://localhost:8080')
+import { socket } from './constants'
+
+import Menu from './Menu'
+import Local from './Local'
+import Lobby from './Lobby'
+import About from './About'
+import Navigation from './Components/Navigation'
+
+/* Navigation */
+import { Switch, Route } from 'react-router-dom'
+import Container from 'react-bootstrap/Container'
+// import NavBox from './Components/NavBox'
 
 export default function App() {
-  const [yourID, setYourId] = useState()
-  const [messages, setMessages] = useState([])
-  const [message, setMessage] = useState('')
+  const [gameState, setGameState] = useState({ _id: '', isOpen: false, players: [], words: [] })
+  const history = useHistory()
 
-  const socketRef = useRef()
-
-  useEffect(() => {
-    console.log('connect')
-    socketRef.current = io.connect('http://localhost:8080')
-    socketRef.current.on('connection', id => {
-      console.log('got id =', id)
-      setYourId(id)
+  useEffect(()=>{
+    socket.on('updateGame', (game) => {
+      console.log(game)
+      setGameState(game)
     })
-    socketRef.current.on('message', message => {
-      console.log('got message =', message)
-      receivedMessage(message)
-    })
+    return () => {
+      socket.removeAllListeners()
+    }
   }, [])
 
-  function receivedMessage(message) {
-    console.log('adding message =', message)
-    setMessages(oldMsgs => [...oldMsgs, message])
-  }
-
-  function sendMessage(e) {
-    e.preventDefault()
-    console.log('sending final message =', message)
-    const messageObject = {
-      body: message,
-      id: yourID,
+  useEffect(()=>{
+    if (gameState._id !== "") {
+      console.log('found gameState', gameState)
+      history.push(`/online/${gameState._id}`)
     }
-    setMessage('')
-    socketRef.current.emit('send message', messageObject) // send to server
-  }
-
-  console.log(messages)
+  }, [gameState._id])
 
   return (
     <>
+      <Navigation />
+      {/* <NavBox /> */}
       <Container>
-        {messages.length > 0 &&
-          messages.map((message, index) => {
-            if (message.id === yourID) {
-              return (
-                <p key={index}>{message.body}</p>
-              )
-            }
-            return (
-              <p key={index}>
-                {message.body}
-              </p>
-            )
-          })
-        }
+        <Switch>
+          <Route path="/" exact component={Menu} />
+          <Route path="/about" exact component={About} />
+          <Route path="/local" exact component={Local} />
+          <Route path="/online/:code"
+            render={() => <Lobby gameState={gameState} />}
+          />
+        </Switch>
       </Container>
-      <Form onSubmit={sendMessage}>
-        <Form.Control placeholder="Enter Message" value={message} onChange={(e) => setMessage(e.target.value)} />
-        <Button type="submit">Send</Button>
-      </Form>
     </>
   )
 }

@@ -5,8 +5,10 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
+    "mongoose": "^5.11.13",
     "path": "^0.12.7",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
@@ -19,6 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "server": "nodemon local.js",
     "dev": "concurrently \"nodemon local.js\" \"react-scripts start\"",
     "for-heroku-deploy-replace-this-with-start-script": "node server.js",
     "build": "react-scripts build",
