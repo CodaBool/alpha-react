@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Game from './Game'
 import Lobby from './Lobby'
 import { socket } from '../constants'
+import Cars from '../Components/Cars'
+import CountDown from '../Components/CountDown'
 import { useHistory, useLocation } from 'react-router-dom'
 import Spinner from 'react-bootstrap/Spinner'
 
@@ -41,7 +43,6 @@ export default function index() {
     })
     // TODO: should find a solution to not need client to finish the game for everyone
     socket.on('done', gameID => {
-      console.log(gameID)
       socket.emit('done', gameID)
       setGameStarted(false)
     })
@@ -51,7 +52,11 @@ export default function index() {
   return (
     <>
       {(game._id && !game.isStarted) && <Lobby game={game} />}
-      {game._id == '' && <Loading />}
+      {game.isStarted && <CountDown />}
+      {game._id == '' 
+        ? <Loading />
+        : <Cars game={game} />
+      }
       {game.isStarted && <Game game={game} loading={Loading} />}
     </>
   )

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
-import CountDown from '../Components/CountDown'
+
+// import Cars from '../Components/Cars'
 import { socket } from '../constants'
 
 export default function Game({ game }) {
@@ -70,12 +71,12 @@ export default function Game({ game }) {
   
   return (
     <div className="mb-4">
-      <CountDown />
+      
       <div ref={quoteDisplay} className="quoteDisplay">
         {quote && quote.map((char, index) => <span key={index}>{char}</span>)}
       </div>
-      <Button variant='secondary' onClick={giveUp}>Give Up</Button>
       <Form.Control as="textarea" value={input} ref={inputRef} disabled={!game.isTypable} className="gameInput" onChange={changeInput} rows={4} />
+      {/* <Button variant='secondary-outline' onClick={giveUp}>Give Up</Button> */}
     </div>
   )
 }

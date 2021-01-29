@@ -37,9 +37,10 @@ io.on('connection', (socket) => {
           if (game.players[index]._id == player._id) {
             if (percent < 100) { // unfinished and verify that there was a change
               if (game.players[index].percent !== percent) {
+                console.log('progress change game state =', game)
                 console.log('progress for', player.name, game.players[index].percent, '->', percent)
                 game.players[index].percent = percent
-                // game = await game.save() // too many calls to perform a save every progress
+                game = await game.save() // too many calls to perform a save every progress
                 io.to(gameID).emit('updateGame', game)
               }
             } else {
@@ -50,6 +51,17 @@ io.on('connection', (socket) => {
               // calculate Words Per Minute
               game.players[index].WPM = calculateWPM(endTime, startTime, player, game.words)
               game.players[index].percent = 100
+
+              // if no one is winner set winner
+              let existsWinner = false
+              for (const player of game.players) {
+                if (player.isWinner) {
+                  existsWinner = true
+                }
+              }
+              if (!existsWinner) {
+                game.players[index].isWinner = true
+              }
 
               // find if all players have finished
               let allDone = true
@@ -63,6 +75,7 @@ io.on('connection', (socket) => {
                 // reset game
                 game.isOpen = true
                 game.isStarted = false
+                game.players[index].percent = 0
                 game.players[index].isReady = false
                 console.log('finishing game with winner as', player.name, 'with wpm =', game.players[index].WPM)
                 io.to(gameID).emit('done', game._id)
@@ -82,16 +95,17 @@ io.on('connection', (socket) => {
   })
 
   socket.on('done', async gameID => {
-    // let game = await Game.findById(gameID)
-    // for (const player of game.players) {
-    //   // skip wpm to display as stat in lobby
-    //   player.percent = 0
-    //   player.givenUp = false
-    //   player.ready = false
-    // }
-    // game.isTypable = false
-    // game.isStarted = false
-    // io.to(gameID).emit('updateGame', game)
+    let game = await Game.findById(gameID)
+    for (const player of game.players) {
+      // skip wpm to display as stat in lobby
+      player.percent = 0
+      player.givenUp = false
+      player.ready = false
+    }
+    game.isTypable = false
+    game.isStarted = false
+    game = await game.save()
+    io.to(gameID).emit('updateGame', game)
     clearInterval(gameTime)
   })
 
@@ -147,6 +161,7 @@ io.on('connection', (socket) => {
           player.percent = 0
           player.givenUp = false
           player.ready = false
+          player.isWinner = false
         }
         game.isTypable = false
         game.isStarted = true

@@ -60,11 +60,6 @@ export default function Lobby({ game }) {
       </Row>
       <Row>
         <Col md={8} className="">
-          {/* <InputGroup /> */}
-          
-          {game.players.map((player, index) => (
-            <p key={player._id}>Player {index + 1}: {player.name} | Ready: {player.isReady ? 'true' : 'false'}</p>
-          ))}
           <StartBtn player={player} game={game} />
         </Col>
         <Col md={4} className="">

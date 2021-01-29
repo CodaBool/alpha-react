@@ -24,6 +24,10 @@
 .shareCode {
   cursor: pointer;
 }
+/* Car */
+.carBox {
+  transition: left 1s;
+}
 /* Loading Message */
 .delayedFade {
   animation: fadein 5s;
