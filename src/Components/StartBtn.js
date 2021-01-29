@@ -1,19 +1,28 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { socket } from '../constants'
 import Button from 'react-bootstrap/Button'
 
-export default function StartBtn({ player, gameID, start }) {
-  const [show, setShow] = useState(true)
-  const { isPartyLeader } = player
+export default function StartBtn({ player, game }) {
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    let allReady = true
+    game.players.forEach(player => {
+      if (!player.isReady) {
+        allReady = false
+      }
+    })
+    if (!game.isStarted) {
+      setShow(allReady)
+    }
+  }, [game])
 
   function start() {
-    socket.emit('timer', { playerID: player._id, gameID })
+    socket.emit('timer', { playerID: player._id, gameID: game._id })
     setShow(false)
   }
 
   return (
-    isPartyLeader && show 
-      ? <Button onClick={start}>Start Game</Button>
-      : null
+    (player.isLeader && show) && <Button onClick={start}>Start Game</Button>
   )
 }

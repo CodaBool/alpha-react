@@ -17,8 +17,7 @@ export default function CountDown() {
 
   return (
     <>
-      <h1>{countDown}</h1>
-      <h3>{msg}</h3>
+      <h1 className="display-4">{msg} {countDown}</h1>
     </>
   )
 }

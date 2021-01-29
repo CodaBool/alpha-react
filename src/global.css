@@ -24,6 +24,15 @@
 .shareCode {
   cursor: pointer;
 }
+/* Loading Message */
+.delayedFade {
+  animation: fadein 5s;
+}
+@keyframes fadein {
+  0% { opacity: 0; }
+  80% { opacity: 0; }
+  100% { opacity: 1; }
+}
 
 /* Chat Room Messages */
 .myMsg {

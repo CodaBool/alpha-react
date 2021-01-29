@@ -1,15 +1,17 @@
 import Button from 'react-bootstrap/Button'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Modal from 'react-bootstrap/Modal'
 import Popover from 'react-bootstrap/Popover'
 import Form from 'react-bootstrap/Form'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { genCode, socket } from './constants'
 
 export default function Menu() {
   const [gameID, setGameID] = useState('')
-  const [nickName, setNickName] = useState('')
-  const [error, setError] = useState('Enter a Name')
+  const [nameError, setNameError] = useState('')
+  const [error, setError] = useState('')
+  const [name, setName] = useState(localStorage.getItem('name') || '')
+  const [show, setShow] = useState(() => {if (localStorage.getItem('name')) return false; else return true})
   const history = useHistory()
 
   function handleCode(e) {
@@ -20,27 +22,35 @@ export default function Menu() {
     }
     setGameID(e.target.value)
   }
+
   function handleName(e) {
     if (e.target.value.length > 11) {
-      setError('Names must be max 12 characters')
+      setNameError('Names must be max 12 characters')
     } else if (e.target.value.length == 0) {
-      setError('Please Enter a Name')
+      setNameError('Please Enter a Name')
+      setName('')
     } else {
-      setError(null)
+      setNameError(null)
+      const char = e.target.value.slice(-1)
+      if (char >= 'A' && char <= 'Z' || char >= 'a' && char <= 'z' || char == ' ') {
+        localStorage.setItem('name', e.target.value)
+        setName(e.target.value)
+      } else {
+        setNameError('Only letter characters Allowed')
+      }
     }
-    setNickName(e.target.value)
   }
 
   function joinGame() {
-    // TODO: should check if game exists before pushing
-    // history.push(`/online/${code.toUpperCase()}`)
-    console.log({ gameID, nickName })
-    socket.emit('join-game', { gameID, nickName })
+    if (localStorage.getItem('name') && gameID) {
+      history.push(`/online/join?gameID=${gameID}`)
+    }
   }
 
   function createGame() {
-    socket.emit('create-game', nickName)
-    // history.push(`/online/lobby/${genCode()}`)
+    if (localStorage.getItem('name')) {
+      history.push('/online/lobby')
+    }
   }
 
   const popover = (
@@ -50,18 +60,18 @@ export default function Menu() {
         &emsp;Join a room which someone has already created and provided you a 24 digit code for to join
         <Form.Control className="my-1" value={gameID} placeholder="24 Digit Code" onChange={handleCode} />
         {error && <p className="text-danger text-center">{error}</p> }
-        <Button onClick={joinGame} className="w-100" disabled={gameID.length !== 24 || error || nickName.length == 0}>Join with Code</Button>
+        <Button onClick={joinGame} className="w-100" disabled={gameID.length !== 24 || error || name.length == 0}>Join with Code</Button>
         <hr/>
         &emsp;Create a new room which generates a 24 digit code for you to provide to another player to join
-        <Button onClick={createGame} disabled={error || nickName.length == 0} className="w-100 mt-3">Create New Room</Button>
+        <Button onClick={createGame} disabled={error || name.length == 0} className="w-100 mt-3">Create New Room</Button>
       </Popover.Content>
     </Popover>
   )
 
   return (
     <>
+      {name && <h1 className="display-4" onClick={() => setShow(true)}>{name}</h1>}
       <div className="mt-5">
-        <Form.Control className="my-1" value={nickName} placeholder="NickName" onChange={handleName} />
         <Button className="w-100 my-2" onClick={() => history.push('/local')}>Play Against AI</Button>
       </div>
       <div>
@@ -69,6 +79,18 @@ export default function Menu() {
           <Button className="w-100 my-2">Challenge Player</Button>
         </OverlayTrigger>
       </div>
+      <Modal show={show} onHide={() => { if (name.length > 0) setShow(false) }}>
+        <Modal.Header>
+          <Modal.Title>Enter a Name</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-danger">{nameError}</p>
+          <Form.Control className="" value={name} placeholder="Name" onChange={handleName} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary w-100" disabled={name.length == 0} onClick={() => setShow(false)}>Play</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }

@@ -1,42 +1,38 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory, Redirect } from 'react-router-dom'
 import Form from 'react-bootstrap/Form'
-import InputGroup from 'react-bootstrap/InputGroup'
 import Row from 'react-bootstrap/Row'
 import Toast from 'react-bootstrap/Toast'
 import Col from 'react-bootstrap/Col'
-import Chat from './Components/Chat'
-import Game from './Components/Game'
-import CountDown from './Components/CountDown'
-import StartBtn from './Components/StartBtn'
-import { socket } from './constants'
+import StartBtn from '../Components/StartBtn'
+import { socket } from '../constants'
 
 function getPlayer(players) {
   return players.find(player => player.socketID === socket.id)
 }
 
-export default function Lobby({ gameState }) {
-  // const query = new URLSearchParams(useLocation().search) // gets code from url query
-  const history = useHistory()
-  const [open, setOpen] = useState(true)
-  const [ready, setReady] = useState(false)
+export default function Lobby({ game }) {
+  const [isOpen, setIsOpen] = useState(true)
+  const [isReady, setIsReady] = useState(false)
   const [show, setShow] = useState(false)
-  const [roomCode, setRoomCode] = useState(history.location.pathname.split('/')[2])
-  const player = getPlayer(gameState.players)
+  const player = getPlayer(game?.players)
 
   useEffect(() => {
     if (player) {
-      socket.emit('ready', { gameID: gameState._id, playerID: player._id, ready })
+      // console.log('changing ready', { gameID: game._id, playerID: player._id, isReady })
+      socket.emit('change-ready', { gameID: game._id, playerID: player._id, isReady })
     }
-  }, [ready])
+  }, [isReady])
+  
+  useEffect(() => {
+    if (player) {
+      // console.log('changing open', { gameID: game._id, isOpen })
+      socket.emit('change-open', { gameID: game._id, isOpen })
+    }
+  }, [isOpen])
 
   function copyCode() {
-    navigator.clipboard.writeText(roomCode)
+    navigator.clipboard.writeText(game._id)
     setShow(true)
-  }
-
-  if (gameState._id === "") {
-    return <Redirect to="/"/>
   }
 
   return (
@@ -50,13 +46,13 @@ export default function Lobby({ gameState }) {
           id="ready"
           className="mr-3"
           label="Ready"
-          checked={ready}
-          onChange={() => setReady(prev => !prev)}
+          checked={isReady}
+          onChange={() => setIsReady(prev => !prev)}
         />
         <span className="border-right mr-3"></span>
         <Form.Check
-          checked={open}
-          onChange={() => setOpen(prev => !prev)}
+          checked={isOpen}
+          onChange={() => setIsOpen(prev => !prev)}
           type="switch"
           id="open"
           label="Open"
@@ -65,12 +61,11 @@ export default function Lobby({ gameState }) {
       <Row>
         <Col md={8} className="">
           {/* <InputGroup /> */}
-          <CountDown />
-          {gameState.players.map((player, index) => (
-            <p key={player._id}>Player {index + 1}: {player.nickName}</p>
+          
+          {game.players.map((player, index) => (
+            <p key={player._id}>Player {index + 1}: {player.name} | Ready: {player.isReady ? 'true' : 'false'}</p>
           ))}
-          <StartBtn player={player} gameID={gameState._id}/>
-          <Game gameState={gameState} />
+          <StartBtn player={player} game={game} />
         </Col>
         <Col md={4} className="">
           {/* <Chat /> */}

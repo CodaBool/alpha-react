@@ -1,14 +1,33 @@
 import io from 'socket.io-client'
 
-// export function genCode() {
-// 	const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ"
-// 	const string_length = 5
-//   let randomstring = ''
-// 	for (let i = 0; i < string_length; i++) {
-// 		var rnum = Math.floor(Math.random() * chars.length)
-// 		randomstring += chars.substring(rnum,rnum+1)
-// 	}
-// 	return randomstring
-// }
+export function debounce(func, wait, immediate) {
+  var timeout
+  return function () {
+    var context = this, args = arguments
+    var later = function () {
+      timeout = null
+      if (!immediate) func.apply(context, args)
+    }
+    var callNow = immediate && !timeout
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+    if (callNow) func.apply(context, args)
+  }
+}
+
+export function timer(func, wait, immediate) {
+  var timeout
+  return function () {
+    var context = this, args = arguments
+    var later = function () {
+      timeout = null
+      if (!immediate) func.apply(context, args)
+    }
+    var callNow = immediate && !timeout
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+    if (callNow) func.apply(context, args)
+  }
+}
 
 export const socket = io('http://localhost:8080')
