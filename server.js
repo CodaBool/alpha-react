@@ -6,23 +6,28 @@ const server = http.createServer(app)
 const mongoose = require('mongoose')
 const socket = require('socket.io')
 const Game = require('./Models/Game')
+const favicon = require('express-favicon')
+const path = require('path')
+const cors = require('cors')
 const allData = require( './src/constants/data.json')
-const simpleData = require( './src/constants/simple.json')
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@typeracerfree.jlmpb.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`
 mongoose.connect(uri,
   { useNewUrlParser: true, useUnifiedTopology: true },
-  () => console.log('successfully connected to database')
+  () => console.log('Successfully connected to database')
 )
 const io = socket(server, {
   cors: { origin: "*" }
 })
 const port = process.env.PORT || 8080
 
-const cors = require('cors')
+// middleware
 app.use(cors())
+app.use(favicon(__dirname + '/build/favicon-32x32.gif'))
+app.use(express.static(__dirname))
+app.use(express.static(path.join(__dirname, 'build')))
 
-app.get('/', (req, res) => {
-  res.send('as')
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'))
 })
 
 io.on('connection', (socket) => {
@@ -38,7 +43,7 @@ io.on('connection', (socket) => {
             if (percent < 100) { // unfinished and verify that there was a change
               if (game.players[index].percent !== percent) {
                 // console.log('progress change game state =', game)
-                console.log('progress for', player.name, game.players[index].percent, '->', percent)
+                // console.log('progress for', player.name, game.players[index].percent, '->', percent)
                 game.players[index].percent = percent
                 game = await game.save() // too many calls to perform a save every progress
                 io.to(gameID).emit('updateGame', game)
@@ -72,13 +77,13 @@ io.on('connection', (socket) => {
                 }
               }
               if (allDone) {
-                console.log('everyone finished or gave up')
+                // console.log('everyone finished or gave up')
                 // reset game
                 game.isOpen = true
                 game.isStarted = false
                 game.players[index].percent = 0
                 game.players[index].isReady = false
-                console.log('finishing game with winner as', player.name, 'with wpm =', game.players[index].WPM)
+                // console.log('finishing game with winner as', player.name, 'with wpm =', game.players[index].WPM)
                 io.to(gameID).emit('done', { gameID: game._id, socketID: game.players[index].socketID })
               }
               // save game
@@ -88,7 +93,7 @@ io.on('connection', (socket) => {
           }
         }
       } else {
-        console.log('game either over or not started')
+        // console.log('game either over or not started')
       }
     } catch (err) {
       console.log(err)
@@ -122,8 +127,8 @@ io.on('connection', (socket) => {
         }
         game.players[index].givenUp = true
         if (allDone) {
-          console.log('last player gave up')
-          console.log('finishing game')
+          // console.log('last player gave up')
+          // console.log('finishing game')
           game.isOpen = true
           game.isStarted = false
           io.to(gameID).emit('done', game._id)
@@ -156,7 +161,7 @@ io.on('connection', (socket) => {
 
       if (countDown == 5) { // move from lobby to game
         // reset player stats
-        console.log('reseting player stats, starting game in', countDown)
+        // console.log('reseting player stats, starting game in', countDown)
         for (const player of game.players) {
           player.WPM = -1
           player.percent = 0
@@ -164,9 +169,9 @@ io.on('connection', (socket) => {
           player.ready = false
           player.isWinner = false
           // prod data
-          // const excerpt = allData[Math.floor(Math.random() * allData.length)]
+          const excerpt = allData[Math.floor(Math.random() * allData.length)]
           // test data
-          const excerpt = simpleData[Math.floor(Math.random() * simpleData.length)]
+          // const excerpt = simpleData[Math.floor(Math.random() * simpleData.length)]
           
           game.quote = excerpt.quote
           game.source = excerpt.source
@@ -209,7 +214,7 @@ io.on('connection', (socket) => {
   socket.on('join-game', async ({ gameID, name }) => {
     try {
       // get game
-      console.log('gameID =', gameID)
+      // console.log('gameID =', gameID)
       let game = await Game.findById(gameID)
       // check if game is allowing users to join
       if (game.isOpen) {
@@ -229,13 +234,12 @@ io.on('connection', (socket) => {
         io.to(gameID).emit('updateGame', game)
       } else {
         // deny request
-        console.log('game closed id =', gameID)
+        // console.log('game closed id =', gameID)
         throw 'Game Closed'
       }
     } catch (err) {
-      console.log('catched err', err)
-      io.to(gameID).emit('closed', { msg: "Code Invalid or Game Closed" })
-      // console.log(err)
+      // io.to(gameID).emit('closed', { msg: "Code Invalid or Game Closed" })
+      console.log(err)
     }
   })
 
@@ -280,9 +284,9 @@ io.on('connection', (socket) => {
       // create game
       let game = new Game()
       // production data
-      // const excerpt = allData[Math.floor(Math.random() * allData.length)]
+      const excerpt = allData[Math.floor(Math.random() * allData.length)]
       // test data
-      const excerpt = simpleData[Math.floor(Math.random() * simpleData.length)]
+      // const excerpt = simpleData[Math.floor(Math.random() * simpleData.length)]
       
       game.quote = excerpt.quote
       game.source = excerpt.source
