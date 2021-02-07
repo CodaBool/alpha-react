@@ -23,8 +23,13 @@ export default function StartBtn({ player, game }) {
   }
 
   return (
-    (player.isLeader && show)
-      ? <Button className="my-5 w-100" variant="danger" onClick={start}>Start Race</Button>
-      : <div style={{height: '134px'}}></div>
+    <>
+      {/* {(player.isLeader && show)
+        ? <Button className="my-5 w-100" variant="danger" onClick={start}>Start Race</Button>
+        : <div style={{height: '134px'}}></div>
+      } */}
+
+      {show && <Button className="" variant="danger" onClick={start}>Start Race</Button>}
+    </>
   )
 }

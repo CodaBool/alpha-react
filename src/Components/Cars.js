@@ -2,7 +2,14 @@ import React from 'react'
 
 export default function Cars({ game }) {
 
-  function getRandomCar(number) {
+  function getRandomCar(id) {
+    let number = 0
+    for (const char of id.split('').reverse()) {
+      if (/^\d+$/.test(char)) {
+        number = Number(char)
+        break
+      }
+    }
     if (number < 2) {
       return "/image/car-blue.png"
     } else if (number < 4) {
@@ -15,7 +22,7 @@ export default function Cars({ game }) {
   }
 
   function getLeft(progress) {
-    return progress / 1.2 + '%'
+    return progress / 1.3 + '%'
   }
 
   return (
@@ -36,8 +43,6 @@ export default function Cars({ game }) {
               <div className="carBox" style={{position: 'relative', left: getLeft(player.percent), display: 'inline'}}>
                 <p className="d-inline mr-2">{player.name}</p>
                 <img src={`${getRandomCar(player._id)}`} />
-                
-                
               </div>
             </div>
           )

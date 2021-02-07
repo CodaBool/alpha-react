@@ -37,7 +37,7 @@ io.on('connection', (socket) => {
           if (game.players[index]._id == player._id) {
             if (percent < 100) { // unfinished and verify that there was a change
               if (game.players[index].percent !== percent) {
-                console.log('progress change game state =', game)
+                // console.log('progress change game state =', game)
                 console.log('progress for', player.name, game.players[index].percent, '->', percent)
                 game.players[index].percent = percent
                 game = await game.save() // too many calls to perform a save every progress
@@ -60,6 +60,7 @@ io.on('connection', (socket) => {
                 }
               }
               if (!existsWinner) {
+                game.players[index].wins++
                 game.players[index].isWinner = true
               }
 
@@ -78,7 +79,7 @@ io.on('connection', (socket) => {
                 game.players[index].percent = 0
                 game.players[index].isReady = false
                 console.log('finishing game with winner as', player.name, 'with wpm =', game.players[index].WPM)
-                io.to(gameID).emit('done', game._id)
+                io.to(gameID).emit('done', { gameID: game._id, socketID: game.players[index].socketID })
               }
               // save game
               game = await game.save()
@@ -162,9 +163,19 @@ io.on('connection', (socket) => {
           player.givenUp = false
           player.ready = false
           player.isWinner = false
+          // prod data
+          // const excerpt = allData[Math.floor(Math.random() * allData.length)]
+          // test data
+          const excerpt = simpleData[Math.floor(Math.random() * simpleData.length)]
+          
+          game.quote = excerpt.quote
+          game.source = excerpt.source
+          game.speed = excerpt.speed
+          game.words = excerpt.quote.split(' ').length
         }
         game.isTypable = false
         game.isStarted = true
+        game = await game.save()
         io.to(gameID).emit('updateGame', game)
       }
       
@@ -258,6 +269,10 @@ io.on('connection', (socket) => {
     } catch (err) {
       console.log(err)
     }
+  })
+
+  socket.on('send-message', body => {
+    io.emit('get-message', body)
   })
 
   socket.on('create-game', async (name) => {

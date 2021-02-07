@@ -8,6 +8,7 @@ const PlayerSchema = new mongoose.Schema({
   socketID: {type: String},
   isLeader: {type: Boolean, default: false},
   isWinner: {type: Boolean, default: false},
+  wins: {type: Number, default: 0},
   isReady: {type: Boolean, default: false}
 })
 

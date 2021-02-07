@@ -3,16 +3,21 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Modal from 'react-bootstrap/Modal'
 import Popover from 'react-bootstrap/Popover'
 import Form from 'react-bootstrap/Form'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 
 export default function Menu() {
   const [gameID, setGameID] = useState('')
+  const [wins, setWins] = useState(null)
   const [nameError, setNameError] = useState('')
   const [error, setError] = useState('')
   const [name, setName] = useState(localStorage.getItem('name') || '')
   const [show, setShow] = useState(() => {if (localStorage.getItem('name')) return false; else return true})
   const history = useHistory()
+
+  useEffect(() => {
+    setWins(localStorage.getItem('wins') || 0)
+  }, [])
 
   function handleCode(e) {
     if (e.target.value.length > 24) {
@@ -71,6 +76,7 @@ export default function Menu() {
   return (
     <>
       {name && <h1 className="display-4" onClick={() => setShow(true)}>{name}</h1>}
+      {wins > 0 && <h4 className="text-muted">Total Wins: {wins}</h4>}
       <div className="mt-5">
         <Button className="w-100 my-2" onClick={() => history.push('/local')}>Play Against AI</Button>
       </div>

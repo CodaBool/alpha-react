@@ -3,6 +3,15 @@
   background-color: yellow;
   outline: none;
 }
+/* Countdown Text resize on small screen */
+@media (max-width: 767px) {
+  .display-1, .display-2, .display-3, .display-4 {
+    font-size: 2rem;
+  }
+  h1, h2 {
+    font-size: 1.5rem;
+  }
+}
 .correct {
   color: green;
 }
@@ -44,6 +53,12 @@
   color: rgb(0, 0, 0);
   padding: 5px;
 }
+.yourName {
+  color: #138E9E;
+}
+.otherName {
+  color: #1E74F5;
+}
 .otherMsg {
   background-image: linear-gradient(to right, rgb(222, 222, 255), rgb(255, 255, 255));
   color: rgb(0, 0, 0);
@@ -52,7 +67,7 @@
 .messages {
   padding: 5px;
   height: 50vh;
-  overflow-y: scroll;
+  overflow: auto;
 }
 .chat {
   border: 1px solid rgb(248, 248, 248);

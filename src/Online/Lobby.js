@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import Toast from 'react-bootstrap/Toast'
-import Col from 'react-bootstrap/Col'
+import Spinner from 'react-bootstrap/Spinner'
 import StartBtn from '../Components/StartBtn'
 import { socket } from '../constants'
 
@@ -30,9 +30,19 @@ export default function Lobby({ game }) {
     }
   }, [isOpen])
 
+
   function copyCode() {
     navigator.clipboard.writeText(game._id)
     setShow(true)
+  }
+
+  if (!player) {
+    return (
+      <>
+        <Spinner animation="border" variant="info" style={{margin: '20% auto 0 auto', display: 'block'}} />
+        <h4 className="delayedFade mt-5 text-center">Cannot connect to lobby</h4>
+      </>
+    )
   }
 
   return (
@@ -49,23 +59,23 @@ export default function Lobby({ game }) {
           checked={isReady}
           onChange={() => setIsReady(prev => !prev)}
         />
-        <span className="border-right mr-3"></span>
-        <Form.Check
-          checked={isOpen}
-          onChange={() => setIsOpen(prev => !prev)}
-          type="switch"
-          id="open"
-          label="Open"
-        />
+        {player.isLeader &&
+          <>
+            <span className="border-right mr-3"></span>
+            <Form.Check
+              checked={isOpen}
+              onChange={() => setIsOpen(prev => !prev)}
+              type="switch"
+              id="open"
+              label="Open"
+            />
+            <span className="border-right mx-3"></span>
+            <StartBtn player={player} game={game} />
+          </>
+        }
+        
       </Row>
-      <Row>
-        <Col md={8} className="">
-          <StartBtn player={player} game={game} />
-        </Col>
-        <Col md={4} className="">
-          {/* <Chat /> */}
-        </Col>
-      </Row>
+      
 
       {/* Copied Room Code Notification */}
       <div style={{position: 'fixed', top: '10%', left: '10px', zIndex: '2'}}>

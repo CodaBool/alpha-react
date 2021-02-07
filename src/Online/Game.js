@@ -24,7 +24,7 @@ export default function Game({ game }) {
     let percent = 0
     const inputValue = quoteDisplay.current?.querySelectorAll('.correct').length
     const quoteValue = game.quote.length
-    percent = (inputValue / quoteValue).toFixed(1) * 100
+    percent = Math.floor((inputValue / quoteValue) * 100)
     // // check if percent is different
     const player = game.players.find(player => player.socketID === socket.id)
     if (player.percent !== percent && percent) {
@@ -75,7 +75,19 @@ export default function Game({ game }) {
       <div ref={quoteDisplay} className="quoteDisplay">
         {quote && quote.map((char, index) => <span key={index}>{char}</span>)}
       </div>
-      <Form.Control as="textarea" value={input} ref={inputRef} disabled={!game.isTypable} className="gameInput" onChange={changeInput} rows={4} />
+      <Form.Control 
+        as="textarea" 
+        onPaste={(e) => e.preventDefault()} 
+        onDragStart={(e) => e.preventDefault()} 
+        onDrop={(e) => e.preventDefault()} 
+        autoComplete="off"
+        value={input} 
+        ref={inputRef} 
+        disabled={!game.isTypable} 
+        className="gameInput" 
+        onChange={changeInput} 
+        rows={4} 
+      />
       {/* <Button variant='secondary-outline' onClick={giveUp}>Give Up</Button> */}
     </div>
   )
