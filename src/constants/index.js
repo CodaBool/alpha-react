@@ -30,4 +30,4 @@ export function timer(func, wait, immediate) {
   }
 }
 
-export const socket = io('http://192.168.1.37:8080')
+export const socket = io(process.env.REACT_APP_SOCKET_DOMAIN)
