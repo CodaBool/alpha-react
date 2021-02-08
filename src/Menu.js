@@ -3,11 +3,14 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Modal from 'react-bootstrap/Modal'
 import Popover from 'react-bootstrap/Popover'
 import Form from 'react-bootstrap/Form'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 
 export default function Menu() {
   const [gameID, setGameID] = useState('')
+  // const [gameID, setGameID] = useState('')
   const [wins, setWins] = useState(null)
   const [nameError, setNameError] = useState('')
   const [error, setError] = useState('')
@@ -74,17 +77,23 @@ export default function Menu() {
   )
 
   return (
-    <>
-      {name && <h1 className="display-4" onClick={() => setShow(true)}>{name}</h1>}
-      {wins > 0 && <h4 className="text-muted">Total Wins: {wins}</h4>}
-      <div className="mt-5">
-        <Button className="w-100 my-2" onClick={() => history.push('/local')}>Play Against AI</Button>
-      </div>
-      <div>
-        <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
-          <Button className="w-100 my-2">Challenge Player</Button>
-        </OverlayTrigger>
-      </div>
+    <div className="menuPage">
+      <Row className="pt-5 m-0">
+        <Col>
+          <Button className="nameButton ml-auto d-block" onClick={() => setShow(true)}>{`${name ? name : 'Click to Enter Name'}`}</Button>
+          <Button className="leftOtherButton my-3 ml-auto d-block">{wins ? wins : '0'} Wins</Button>
+        </Col>
+        <Col>
+          <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+            <Button className="playButton">Play Now</Button>
+          </OverlayTrigger>
+          <Button className="rightOtherButton my-3 mr-auto d-block" onClick={() => history.push('/about')}>About</Button>
+        </Col>
+      </Row>
+      
+      <Row className="p-0 m-0">
+        <video autoPlay loop src="/video/title.mp4" className="w-75 mx-auto"></video>
+      </Row>
       <Modal show={show} onHide={() => { if (name.length > 0) setShow(false) }}>
         <Modal.Header>
           <Modal.Title>Enter a Name</Modal.Title>
@@ -94,9 +103,9 @@ export default function Menu() {
           <Form.Control className="" value={name} placeholder="Name" onChange={handleName} />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary w-100" disabled={name.length == 0} onClick={() => setShow(false)}>Play</Button>
+          <Button variant="primary" className="w-100" disabled={name.length == 0} onClick={() => setShow(false)}>Play</Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   )
 }

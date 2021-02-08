@@ -10,6 +10,8 @@ import { useHistory, useLocation } from 'react-router-dom'
 import Spinner from 'react-bootstrap/Spinner'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
+import Navigation from '../Components/Navigation'
+import Container from 'react-bootstrap/Container'
 
 const Loading = () => (
   <>
@@ -57,21 +59,24 @@ export default function index() {
 
   return (
     <>
-      <Row>
-        <Col md={8} className="">
-          {(game._id && !game.isStarted) && <Lobby game={game} />}
-          {game.isStarted && <CountDown />}
-          {game._id == '' 
-            ? <Loading />
-            : <Cars game={game} />
-          }
-          <Stats game={game} gameStarted={gameStarted} winnerSocket={winnerSocket} setWinnerSocket={setWinnerSocket} />
-          {game.isStarted && <Game game={game} loading={Loading} />}
-        </Col>
-        <Col md={4} className="mt-4">
-          {game._id !== '' && <Chat game={game} />}
-        </Col>
-      </Row>
+      <Navigation />
+      <Container>
+        <Row>
+          <Col md={8} className="">
+            {(game._id && !game.isStarted) && <Lobby game={game} />}
+            {game.isStarted && <CountDown />}
+            {game._id == '' 
+              ? <Loading />
+              : <Cars game={game} />
+            }
+            <Stats game={game} gameStarted={gameStarted} winnerSocket={winnerSocket} setWinnerSocket={setWinnerSocket} />
+            {game.isStarted && <Game game={game} loading={Loading} />}
+          </Col>
+          <Col md={4} className="mt-4">
+            {game._id !== '' && <Chat game={game} />}
+          </Col>
+        </Row>
+      </Container>
     </>
   )
 }
