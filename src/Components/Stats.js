@@ -34,11 +34,18 @@ export default function Stats({ game, winnerSocket, setWinnerSocket }) {
           return (
             <Card key={player._id} className="rounded shadow mt-5 p-3">
               <p className="text-muted">
-                {game.quote.substring(0, 300) + ' ...'}
+                {game.quote.substring(0, 300)}
+                {game.quote.length > 300 && ' ...'}
               </p>
               <p className="font-italic">
                 - {game.source}
               </p>
+              <div className="d-block">
+                <span className="text-muted">
+                  Average WPM: 
+                </span>
+                <span className=""> {game.speed}</span>
+              </div>
             </Card>
           )
       })}
